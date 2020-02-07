@@ -38,6 +38,7 @@ requirejs(['ext_editor_io', 'jquery_190', 'raphael_210'],
                 axis: {
                     'stroke-width': '1px',
                     'stroke': '#294270',
+                    'arrow-end': 'block-wide-long',
                 },
             };
 
@@ -104,10 +105,10 @@ requirejs(['ext_editor_io', 'jquery_190', 'raphael_210'],
              *
              *----------------------------------------------*/
             // horizontal
-            paper.path(['M', 0, (max_height)*unit, 'h', grid_size_px]).attr(attr.axis)
+            paper.path(['M', 0, (max_height)*unit, 'h', grid_size_px-4]).attr(attr.axis)
 
             // vertical
-            paper.path(['M', (min_width*-1)*unit, 0, 'v', grid_size_px]).attr(attr.axis)
+            paper.path(['M', (min_width*-1)*unit, (max_units)*unit, 'v', -(grid_size_px-4)]).attr(attr.axis)
 
             /*----------------------------------------------*
              *
@@ -135,7 +136,7 @@ requirejs(['ext_editor_io', 'jquery_190', 'raphael_210'],
              *----------------------------------------------*/
             const x = -min_width*unit
             const y = max_height*unit
-            paper.text(x-unit/4, y+unit/4, 0).attr({'font-size': max_units/7*12})
+            paper.text(x-unit/4, y+unit/3, 0).attr({'font-size': 7/max_units*20})
         }
 
         var $tryit;
