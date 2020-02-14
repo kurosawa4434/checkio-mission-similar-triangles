@@ -12,6 +12,78 @@ from fractions import Fraction
 from my_solution import similar_triangles
 
 
+class Triangle:
+    def __init__(self, coords):
+        self.coords = coords
+
+    def random_scaling(self):
+        x1, y1, x2, y2, x3, y3 = chain(*self.coords)
+        scaling_candidates = []
+        for s in range(1, 20):
+            new_x2 = x1 + (x2 - x1) * s
+            new_x3 = x1 + (x3 - x1) * s
+            new_y2 = y1 + (y2 - y1) * s
+            new_y3 = y1 + (y3 - y1) * s
+            if (max(x1, new_x2, new_x3) - min(x1, new_x2, new_x3) <= 20
+                    and max(y1, new_y2, new_y3) - min(y1, new_y2, new_y3) <= 20):
+                scaling_candidates.append({(x1, y1), (new_x2, new_y2), (new_x3, new_y3)})
+            else:
+                break
+        self.coords = choice(scaling_candidates)
+
+    def random_rotation(self):
+        rot = randint(0, 3)
+
+        def rotate(coord):
+            rot_coord = complex(*coord) * (1j ** rot)
+            return int(rot_coord.real), int(rot_coord.imag)
+
+        self.coords = list(map(rotate, self.coords))
+
+    def random_reflection(self):
+        sign = choice([-1, 1])
+        self.coords = list(map(lambda co: (co[0] * sign, co[1]), self.coords))
+
+    def random_translation(self):
+        xs = [co[0] for co in self.coords]
+        ys = [co[1] for co in self.coords]
+        dx = randint(-10 - min(xs), 10 - max(xs))
+        dy = randint(-10 - min(ys), 10 - max(ys))
+        self.coords = list(map(lambda x, y: (x + dx, y + dy), xs, ys))
+
+
+def make_random_triangle():
+    coords_set = set()
+    while True:
+        while len(coords_set) < 3:
+            x = randint(-5, 5)
+            y = randint(-5, 5)
+            coords_set.add((x, y))
+        coords = list(coords_set)
+        if len(set(map(lambda a, b: (c := a[0] - b[0]) and Fraction(a[1] - b[1], c),
+                       coords, coords[1:]))) != 1:
+            return Triangle(coords)
+        coords_set.clear()
+
+
+def make_two_triangles():
+    if choice([1, 1, 1, 0]):
+        # similar triangles
+        triangle_1 = make_random_triangle()
+        triangle_2 = Triangle(triangle_1.coords)
+        triangle_2.random_scaling()
+        triangle_2.random_reflection()
+        triangle_2.random_rotation()
+    else:
+        # at random
+        triangle_1 = make_random_triangle()
+        triangle_2 = make_random_triangle()
+
+    triangle_2.random_translation()
+
+    return triangle_1.coords, triangle_2.coords
+
+
 def make_random_tests(num):
     random_tests = []
     for _ in range(num):
@@ -19,70 +91,6 @@ def make_random_tests(num):
         random_tests.append({'input': [coords_1, coords_2],
                              'answer': similar_triangles(coords_1, coords_2)})
     return random_tests
-
-
-def make_two_triangles():
-    def make_ronadom_triangle():
-        coords_set = set()
-        while True:
-            while len(coords_set) < 3:
-                x = randint(-5, 5)
-                y = randint(-5, 5)
-                coords_set.add((x, y))
-            coords = list(coords_set)
-            if len(set(map(lambda a, b: (c := a[0] - b[0]) and Fraction(a[1] - b[1], c), coords, coords[1:]))) != 1:
-                return coords
-            coords_set.clear()
-
-    def scaling(coords):
-        x, y, x1, y1, x2, y2 = chain(*coords)
-        scaling_candidates = []
-        for s in range(1, 20):
-            new_x1 = x + (x1 - x) * s
-            new_x2 = x + (x2 - x) * s
-            new_y1 = y + (y1 - y) * s
-            new_y2 = y + (y2 - y) * s
-            if (max(x, new_x1, new_x2) - min(x, new_x1, new_x2) <= 20
-                    and max(y, new_y1, new_y2) - min(y, new_y1, new_y2) <= 20):
-                scaling_candidates.append({(x, y), (new_x1, new_y1), (new_x2, new_y2)})
-            else:
-                break
-        scale = randint(0, len(scaling_candidates) - 1)
-        return scaling_candidates[scale]
-
-    def rotation(coords):
-        rot = randint(0, 3)
-
-        def rotate(coord):
-            rot_coord = complex(*coord) * (1j ** rot)
-            return int(rot_coord.real), int(rot_coord.imag)
-
-        return list(map(rotate, coords))
-
-    def reflection(coords):
-        sign = choice([-1, 1])
-        return list(map(lambda co: (co[0] * sign, co[1]), coords))
-
-    def translation(coords):
-        xs = [co[0] for co in coords]
-        ys = [co[1] for co in coords]
-        dx = randint(-10 - min(xs), 10 - max(xs))
-        dy = randint(-10 - min(ys), 10 - max(ys))
-        return list(map(lambda x, y: (x + dx, y + dy), xs, ys))
-
-    # main
-    if choice([1, 1, 1, 0]):
-        # similar triangles
-        triangle_1 = make_ronadom_triangle()
-        triangle_2 = scaling(triangle_1)
-        triangle_2 = reflection(triangle_2)
-        triangle_2 = rotation(triangle_2)
-    else:
-        # at random
-        triangle_1 = make_ronadom_triangle()
-        triangle_2 = make_ronadom_triangle()
-
-    return triangle_1, translation(triangle_2)
 
 
 TESTS = {
