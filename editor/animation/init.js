@@ -144,7 +144,7 @@ requirejs(['ext_editor_io', 'jquery_190', 'raphael_210'],
         var io = new extIO({
             multipleArguments: true,
             functions: {
-                python: 'similar_triangels',
+                python: 'similar_triangles',
                 js: 'similarTriangles'
             },
             animation: function($expl, data){
