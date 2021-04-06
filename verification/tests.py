@@ -150,6 +150,11 @@ TESTS = {
             "answer": False,
             "explanation": 'rotate different'
         },
+        {
+            "input": [[[10, 10], [5, 10], [-10, -10]], [[10, 10], [7, 6], [-10, -10]]],
+            "answer": False,
+            "explanation": 'only ratio of 2 sides'
+        },
     ],
     "Randoms": make_random_tests(10),
 }
